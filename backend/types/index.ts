@@ -1,9 +1,9 @@
 import { Request } from "express";
-import { UserDocument } from "./models.types";
+import { UserDocument, NotificationDocument } from "./models.types";
 
 interface RequestWithUser extends Request {
     user?: any
 }
 
 
-export type { RequestWithUser, UserDocument }
+export type { RequestWithUser, UserDocument, NotificationDocument }

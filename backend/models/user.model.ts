@@ -56,8 +56,8 @@ const userSchema = new mongoose.Schema<UserDocument>({
 }, { timestamps: true });
 
 
-userSchema.methods.hashPassword = async function () {
-    this.password = await argon2d.hash(this.password);
+userSchema.methods.hashPassword = async function (password: string) {
+    this.password = await argon2d.hash(password);
 };
 
 userSchema.methods.comparePassword = async function (password: string) {

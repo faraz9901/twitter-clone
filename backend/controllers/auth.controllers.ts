@@ -1,19 +1,17 @@
 import User from "../models/user.model";
 import { ApiError, ApiSuccessResponse, asyncHandler } from "../utils";
-import { signinDto, signupDto } from "../validation-dtos/auth.dto";
+import { signinDto, signupDto } from "../utils/validation-dtos/auth.dto";
 
 export const signin = asyncHandler(async (req, res) => {
 
     // validation using zod if error it will throw an error which is handled by global error handler
-    signinDto.parse(req.body);
+    const validatedBody = signinDto.parse(req.body);
 
-    const user = await User.findOne({ username: req.body.username });
+    const user = await User.findOne({ username: validatedBody.username });
 
     if (!user) throw new ApiError('User not found', 404);
 
-    const isValidPassword = await user.comparePassword(req.body.password)
-
-    console.log(isValidPassword);
+    const isValidPassword = await user.comparePassword(validatedBody.password)
 
     if (!isValidPassword) throw new ApiError('Invalid credentials', 401);
 
@@ -33,15 +31,16 @@ export const signin = asyncHandler(async (req, res) => {
 
 
 export const signup = asyncHandler(async (req, res) => {
-    signupDto.parse(req.body);
 
-    const isUserExists = await User.findOne({ $or: [{ email: req.body.email }, { username: req.body.username }] });
+    const result = signupDto.parse(req.body);
+
+    const isUserExists = await User.findOne({ $or: [{ email: result.email }, { username: result.username }] });
 
     if (isUserExists) throw new ApiError('User with email or username already exists', 400);
 
-    const user = new User(req.body);
+    const user = new User(result);
 
-    await user.hashPassword();
+    await user.hashPassword(result.password);
 
     const newUser = await user.save();
 

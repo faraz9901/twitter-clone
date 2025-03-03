@@ -2,6 +2,27 @@ import { NextFunction, Response } from "express";
 import { ApiError, ApiSuccessResponse } from "./ApiResponses";
 import { RequestWithUser } from "../types";
 import { ZodError } from "zod";
+import { v2 as cloudinary } from 'cloudinary'
+
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+})
+
+
+const uploadToCloudinary = async (file: any) => {
+    return await cloudinary.uploader.upload(file)
+}
+
+const deleteFromCloudinary = async (url: string) => {
+    const urlArray = url.split('/')
+
+    const publicId = urlArray[urlArray.length - 1].split('.')[0]
+
+    return await cloudinary.uploader.destroy(publicId)
+}
 
 const asyncHandler = (fn: (req: RequestWithUser, res: Response, next: NextFunction) => any) => (req: RequestWithUser, res: Response, next: NextFunction) => Promise.resolve(fn(req, res, next)).catch(next);
 
@@ -31,4 +52,5 @@ function globalErrorHandler(err: any, _req: RequestWithUser, res: Response, _nex
 
 
 
-export { asyncHandler, globalErrorHandler, ApiError, ApiSuccessResponse }
+
+export { asyncHandler, globalErrorHandler, ApiError, ApiSuccessResponse, uploadToCloudinary, deleteFromCloudinary }
