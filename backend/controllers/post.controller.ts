@@ -93,6 +93,8 @@ export const likeUnlikePost = asyncHandler(async (req, res) => {
 
     if (!user) throw new ApiError('User not found', 404);
 
+    if (user._id.toString() === post.user.toString()) throw new ApiError('You cannot like your own post', 400);
+
     const isLiked = (post.likes as Types.ObjectId[]).includes(user._id);
 
     if (isLiked) {
@@ -120,6 +122,7 @@ export const likeUnlikePost = asyncHandler(async (req, res) => {
 
     return res.status(200).json(new ApiSuccessResponse(`Post ${isLiked ? 'unliked' : 'liked'} successfully`));
 })
+
 
 
 export const getAllPosts = asyncHandler(async (req, res) => {

@@ -67,6 +67,9 @@ function globalErrorHandler(err: any, _req: RequestWithUser, res: Response, _nex
 }
 
 
+const stringToObjectId = (id: string) => {
+    return new mongoose.Types.ObjectId(id)
+}
 
 
-export { asyncHandler, globalErrorHandler, ApiError, ApiSuccessResponse, uploadToCloudinary, deleteFromCloudinary }
+export { asyncHandler, globalErrorHandler, stringToObjectId, ApiError, ApiSuccessResponse, uploadToCloudinary, deleteFromCloudinary }
