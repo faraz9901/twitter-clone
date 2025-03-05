@@ -1,6 +1,5 @@
 import { NextFunction, Response } from "express";
 import { ApiError, ApiSuccessResponse } from "./ApiResponses";
-import { RequestWithUser } from "../types";
 import { ZodError } from "zod";
 import { v2 as cloudinary } from 'cloudinary'
 import mongoose from "mongoose";

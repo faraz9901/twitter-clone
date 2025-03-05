@@ -1,7 +1,6 @@
 import { Types } from "mongoose";
 import User from "../models/user.model";
 import { ApiError, ApiSuccessResponse, asyncHandler, deleteFromCloudinary, uploadToCloudinary } from "../utils";
-import { UserDocument } from "../types";
 import Notification from "../models/notification.model";
 import { NotificationTypes } from "../utils/enums";
 import { updateUserDto } from "../utils/validation-dtos/user.dto";

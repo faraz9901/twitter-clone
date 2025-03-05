@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import * as argon2d from "argon2";
-import { UserDocument } from "../types";
 import { Response } from "express";
 import jwt from "jsonwebtoken";
 
