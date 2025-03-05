@@ -3,6 +3,7 @@ import { ApiError, ApiSuccessResponse } from "./ApiResponses";
 import { ZodError } from "zod";
 import { v2 as cloudinary } from 'cloudinary'
 import mongoose from "mongoose";
+import { RequestWithUser } from "../types";
 
 
 cloudinary.config({

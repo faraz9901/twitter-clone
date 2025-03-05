@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { NotificationTypes } from "../utils/enums";
+import { NotificationDocument } from "../types";
 
 
 const notificationSchema = new mongoose.Schema<NotificationDocument>({

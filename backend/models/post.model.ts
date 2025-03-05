@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { PostDocument } from "../types";
 
 const postSchema = new mongoose.Schema<PostDocument>({
     user: {

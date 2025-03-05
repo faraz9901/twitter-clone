@@ -14,7 +14,9 @@ import forLoggedInUsers from "./middleware/forLoggedInUsers";
 // utils
 import { globalErrorHandler } from "./utils";
 import { connectToDB } from "./utils/db";
+import { RequestWithUser } from "./types";
 
+//import "./types/global"
 
 dotenv.config();
 

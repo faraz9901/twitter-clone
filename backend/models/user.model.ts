@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import * as argon2d from "argon2";
 import { Response } from "express";
 import jwt from "jsonwebtoken";
+import { UserDocument } from "../types";
 
 const userSchema = new mongoose.Schema<UserDocument>({
     username: {
