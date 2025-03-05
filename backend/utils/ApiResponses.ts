@@ -12,12 +12,10 @@ class ApiSuccessResponse {
 
 class ApiError extends Error {
     success: boolean;
-    message: string;
     statusCode: number;
     constructor(message: string, statusCode: number) {
         super(message);
         this.success = false;
-        this.message = message;
         this.statusCode = statusCode;
         Error.captureStackTrace(this, this.constructor);
     }

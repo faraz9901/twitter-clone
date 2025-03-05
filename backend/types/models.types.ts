@@ -14,6 +14,7 @@ interface UserDocument extends mongoose.Document {
     coverImg: string;
     bio: string;
     link: string;
+    likedPosts: mongoose.Types.ObjectId[] | UserDocument[];
     comparePassword: (password: string) => Promise<boolean>;
     hashPassword: (password: string) => Promise<void>;
     generateJWTandSetCookie: (res: Response) => void
@@ -27,5 +28,18 @@ interface NotificationDocument extends mongoose.Document {
     isRead: boolean
 }
 
+interface PostDocument extends mongoose.Document {
+    _id: mongoose.Types.ObjectId;
+    user: mongoose.Types.ObjectId | UserDocument;
+    text: string;
+    image: string;
+    likes: mongoose.Types.ObjectId[] | UserDocument[];
+    comments: Array<{
+        text: string;
+        user: mongoose.Types.ObjectId | UserDocument;
+        createdAt?: Date
+    }>
+}
 
-export type { UserDocument, NotificationDocument }
+
+export type { UserDocument, NotificationDocument, PostDocument }

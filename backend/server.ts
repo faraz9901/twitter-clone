@@ -1,10 +1,10 @@
 import express, { NextFunction, Response } from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import { v2 as cloudinary } from 'cloudinary'
 
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
+import postRoutes from "./routes/posts.routes";
 import { globalErrorHandler } from "./utils";
 import { connectToDB } from "./utils/db";
 import { RequestWithUser } from "./types";
@@ -20,8 +20,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
 
+// TODO like unlike post by user,followers and following
+
 app.use('/api/auth', authRoutes)
 app.use('/api/users', forLoggedInUsers, userRoutes)
+app.use('/api/posts', forLoggedInUsers, postRoutes)
 
 
 //global error handler

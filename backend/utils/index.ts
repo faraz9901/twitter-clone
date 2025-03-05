@@ -3,6 +3,7 @@ import { ApiError, ApiSuccessResponse } from "./ApiResponses";
 import { RequestWithUser } from "../types";
 import { ZodError } from "zod";
 import { v2 as cloudinary } from 'cloudinary'
+import mongoose from "mongoose";
 
 
 cloudinary.config({
@@ -29,9 +30,10 @@ const asyncHandler = (fn: (req: RequestWithUser, res: Response, next: NextFuncti
 
 function globalErrorHandler(err: any, _req: RequestWithUser, res: Response, _next: NextFunction) {
 
+    // Error thrown by us
     if (err instanceof ApiError) {
         return res.status(err.statusCode).json({
-            message: err.message || "Something went wrong",
+            message: err.message,
             success: false,
         });
     }
@@ -44,6 +46,20 @@ function globalErrorHandler(err: any, _req: RequestWithUser, res: Response, _nex
         })
     }
 
+    if (err instanceof mongoose.Error.ValidationError) {
+        return res.status(400).json({
+            success: false,
+            message: err.errors[0].message,
+        })
+    }
+
+    if (err instanceof mongoose.Error.CastError) {
+        // Mongoose cast error (e.g., invalid ObjectId)
+        return res.status(400).send({ success: false, message: 'Invalid ID' });
+    }
+
+
+    // for any other errors
     return res.status(500).json({
         message: "Something went wrong",
         success: false,
