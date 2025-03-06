@@ -1,50 +1,40 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
-// Layout
+// Layouts
 import MainLayout from "./pages/main/MainLayout";
+import RootLayout from "./pages/RootLayout";
 
 // Pages
-import NotFound from "./pages/NotFound";
-import Home from "./pages/main/Home";
-import Login from "./pages/auth/Login";
-import SignUp from "./pages/auth/SignUp";
+import HomePage from "./pages/main/Home";
+import ProfilePage from "./pages/main/profile";
 import Notification from "./pages/main/Notifications";
-import ProfilePage from "./pages/main/Profile";
+import LoginPage from "./pages/auth/Login";
+import SignUpPage from "./pages/auth/SignUp";
+import NotFound from "./pages/NotFound";
 
 const router = createBrowserRouter(
-  [
-    {
-      path: "/signin",
-      element: <Login />,
-    },
-    {
-      path: "/signup",
-      element: <SignUp />,
-    },
-    {
-      path: "/",
-      element: <MainLayout />,
-      children: [
-        {
-          path: "/",
-          element: <Home />,
-        },
-        {
-          path: "/notifications",
-          element: <Notification />,
-        },
-        {
-          path: "/profile/:username",
-          element: <ProfilePage />,
-        },
-      ]
-    },
-    { path: "*", element: <NotFound /> }, // catch all route
-  ]
-);
+  createRoutesFromElements(
+    <Route path="/" element={<RootLayout />}>
+      <Route path="/sign-in" element={<LoginPage />} />
+      <Route path="/sign-up" element={<SignUpPage />} />
+      <Route path="/" element={<MainLayout />}>
+        <Route index element={<HomePage />} />
+        <Route path="/profile/:username" element={<ProfilePage />} />
+        <Route path="/notifications" element={<Notification />} />
+      </Route>
+      <Route path="*" element={<NotFound />} />
+    </Route>
+  )
+)
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <Toaster />
+    </>
+  )
 }
 
 export default App;

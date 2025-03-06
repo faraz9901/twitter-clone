@@ -1,14 +1,11 @@
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
-
-
-
-import EditProfileModal from "./EditProfile";
 import ProfileSkeleton from "../../../components/common/skeletons/ProfileSkeleton";
 import { POSTS } from "../../../data";
 import Posts from "../../../components/posts/Posts";
 import { CalendarDays, Link as Link2, MoveLeft, Pencil } from "lucide-react";
+import EditProfileModal from "./EditProfile";
 
 const ProfilePage = () => {
     const [coverImg, setCoverImg] = useState<string | null>(null);

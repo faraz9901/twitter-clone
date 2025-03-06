@@ -1,8 +1,35 @@
 import { Link } from "react-router-dom";
 import Twitter from "./Twitter";
 import { BellRing, House, LogOut, UserRound } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const Sidebar = () => {
+    const queryClient = useQueryClient()
+
+    const { mutate: logout } = useMutation({
+        mutationFn: async () => {
+            const res = await fetch("/api/auth/signout", {
+                method: "POST",
+            });
+
+            const result = await res.json();
+
+            if (!result.success) {
+                throw new Error(result.message);
+            }
+            return result
+        },
+
+        onError: (error) => {
+            toast.error(error.message)
+        },
+        onSuccess: () => {
+            toast.success("Logout Successfull")
+            queryClient.invalidateQueries({ queryKey: ["user"] })
+        }
+    })
+
     const data = {
         fullName: "John Doe",
         username: "johndoe",
@@ -60,7 +87,13 @@ const Sidebar = () => {
                                 <p className='text-white font-bold text-sm w-20 truncate'>{data?.fullName}</p>
                                 <p className='text-slate-500 text-sm'>@{data?.username}</p>
                             </div>
-                            <LogOut className='w-5 h-5 cursor-pointer' />
+                            <LogOut
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    logout()
+                                }}
+                                className='w-5 h-5 cursor-pointer'
+                            />
                         </div>
                     </Link>
                 )}

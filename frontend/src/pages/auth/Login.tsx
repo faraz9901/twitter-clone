@@ -2,19 +2,49 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Twitter from "../../components/common/Twitter";
 import { Mail, RectangleEllipsis } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 
 const LoginPage = () => {
+    const queryClient = useQueryClient();
+
     const [formData, setFormData] = useState({
         username: "",
         password: "",
     });
 
-    const [isError, setIsError] = useState("");
+    const { isPending, mutate } = useMutation({
+        mutationFn: async (data: { username: string; password: string; }) => {
+            const res = await fetch('/api/auth/signin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+
+            const result = await res.json()
+
+            if (!result.success) {
+                throw new Error(result.message)
+            }
+
+            return result
+        },
+        onError: (error) => {
+            toast.error(error.message)
+        },
+        onSuccess: () => {
+            toast.success("Login Successfull")
+            queryClient.invalidateQueries({ queryKey: ["user"] })
+        }
+    })
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(formData);
+        mutate(formData)
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,11 +84,10 @@ const LoginPage = () => {
                             value={formData.password}
                         />
                     </label>
-                    <button className='btn rounded-full btn-primary text-white'>Login</button>
-                    {isError && <p className='text-red-500'>Something went wrong</p>}
+                    <button disabled={isPending} className='btn rounded-full btn-primary text-white'>{isPending ? <>Logging in <LoadingSpinner size="xs" /> </> : "Login"}</button>
                     <div className='flex flex-col gap-2 mt-4'>
                         <p className='text-white text-lg'>{"Don't"} have an account?</p>
-                        <Link to='/signup'>
+                        <Link to='/sign-up'>
                             <button className='btn rounded-full btn-primary text-white btn-outline w-full'>Sign up</button>
                         </Link>
                     </div>

@@ -4,25 +4,55 @@ import React, { useState } from "react";
 import { Mail, PencilLine, RectangleEllipsis, UserRound } from 'lucide-react'
 
 import Twitter from "../../components/common/Twitter";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const SignUpPage = () => {
+    const queryClient = useQueryClient();
+
     const [formData, setFormData] = useState({
         email: "",
         username: "",
-        fullName: "",
+        fullname: "",
         password: "",
     });
 
+
+    const { isPending, mutate } = useMutation({
+        mutationFn: async (data: { email: string; username: string; fullname: string; password: string; }) => {
+            const res = await fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+
+            const result = await res.json()
+
+            if (!result.success) {
+                throw new Error(result.message)
+            }
+            return result
+        },
+        onSuccess: () => {
+            toast.success("Account created successfully")
+            queryClient.invalidateQueries({ queryKey: ["user"] })
+        },
+        onError: (error) => {
+            toast.error(error.message)
+        }
+    })
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(formData);
+        mutate(formData)
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
-
-    const isError = false;
 
     return (
         <div className='max-w-screen-xl mx-auto flex h-screen px-10'>
@@ -63,9 +93,9 @@ const SignUpPage = () => {
                                 type='text'
                                 className='grow'
                                 placeholder='Full Name'
-                                name='fullName'
+                                name='fullname'
                                 onChange={handleInputChange}
-                                value={formData.fullName}
+                                value={formData.fullname}
                             />
                         </label>
                     </div>
@@ -80,12 +110,11 @@ const SignUpPage = () => {
                             value={formData.password}
                         />
                     </label>
-                    <button className='btn rounded-full btn-primary text-white'>Sign up</button>
-                    {isError && <p className='text-red-500'>Something went wrong</p>}
+                    <button disabled={isPending} className='btn rounded-full btn-primary text-white'>{isPending ? <>Signing in <LoadingSpinner size="xs" /> </> : "Sign up"}</button>
                 </form>
                 <div className='flex flex-col lg:w-2/3 gap-2 mt-4'>
                     <p className='text-white text-lg'>Already have an account?</p>
-                    <Link to='/signin'>
+                    <Link to='/sign-in'>
                         <button className='btn rounded-full btn-primary btn-outline w-full'>Sign in</button>
                     </Link>
                 </div>

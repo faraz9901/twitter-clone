@@ -1,9 +1,9 @@
-import { Outlet, useLocation } from 'react-router-dom'
-import Sidebar from '../../components/common/SIdebar'
+import { Outlet } from 'react-router-dom'
+
 import RightPanel from '../../components/common/RightPanel';
+import Sidebar from '../../components/common/Sidebar';
 
 export default function MainLayout() {
-    const location = useLocation();
     return (
         <div className='flex'>
             <Sidebar />
