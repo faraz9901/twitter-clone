@@ -1,13 +1,23 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import Twitter from "../../components/common/Twitter";
 import { Mail, RectangleEllipsis } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { useAuth } from "../../context/User.Context";
+
 
 
 const LoginPage = () => {
+    const { user } = useAuth()
+
+    if (user) return <Navigate to="/" />
+
+    return <Login />
+}
+
+const Login = () => {
     const queryClient = useQueryClient();
 
     const [formData, setFormData] = useState({
@@ -96,4 +106,5 @@ const LoginPage = () => {
         </div>
     );
 };
+
 export default LoginPage;

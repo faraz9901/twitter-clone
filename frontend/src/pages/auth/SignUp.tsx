@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import React, { useState } from "react";
 
 import { Mail, PencilLine, RectangleEllipsis, UserRound } from 'lucide-react'
@@ -7,8 +7,19 @@ import Twitter from "../../components/common/Twitter";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { useAuth } from "../../context/User.Context";
+
 
 const SignUpPage = () => {
+    const { user } = useAuth()
+
+    if (user) return <Navigate to="/" />
+
+    return <SignUp />
+}
+
+
+const SignUp = () => {
     const queryClient = useQueryClient();
 
     const [formData, setFormData] = useState({

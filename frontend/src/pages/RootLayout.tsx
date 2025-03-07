@@ -1,10 +1,11 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom"
+import { Outlet, useLocation } from "react-router-dom"
 import LoadingSpinner from "../components/common/LoadingSpinner"
 import { useQuery } from "@tanstack/react-query"
+import { useAuth } from "../context/User.Context"
 
 function RootLayout() {
-    const navigate = useNavigate()
     const location = useLocation()
+    const { setUser } = useAuth()
 
     const { isLoading } = useQuery({
         queryKey: ["user"],
@@ -14,12 +15,11 @@ function RootLayout() {
 
             if (!result.success) {
                 // if user not signed in
-                navigate("/sign-in")
+                setUser(null)
                 return null
             }
 
-            if (location.pathname === "/sign-in" || location.pathname === "/sign-up") navigate("/")
-
+            setUser(result.data)
             return result
         },
         retry: false
