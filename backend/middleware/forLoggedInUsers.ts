@@ -7,11 +7,15 @@ const forLoggedInUsers = asyncHandler(async (req, res, next) => {
 
     if (!token) throw new ApiError('Unauthorized', 401);
 
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET as string);
+    try {
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET as string);
 
-    if (!decodedToken) throw new ApiError('Unauthorized', 401);
+        if (!decodedToken) throw new Error('Invalid token');
 
-    req.user = decodedToken
+        req.user = decodedToken
+    } catch (error) {
+        throw new ApiError('Session expired', 401);
+    }
 
     next();
 })

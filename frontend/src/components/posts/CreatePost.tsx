@@ -1,23 +1,50 @@
 import { BookImage, Smile, X } from "lucide-react";
 import { useRef, useState } from "react";
+import { useAuth } from "../../context/User.Context";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 
 const CreatePost = () => {
     const [text, setText] = useState("");
     const [img, setImg] = useState<string | null>(null);
-
+    const { user } = useAuth()
     const imgRef = useRef<HTMLInputElement | null>(null);
+    const queryClient = useQueryClient()
 
-    const isPending = false;
-    const isError = false;
+    const { mutate: createPost, isPending } = useMutation({
+        mutationFn: async (data: { text: string, img: any }) => {
 
-    const data = {
-        profileImg: "/avatars/boy1.png",
-    };
+            const res = await fetch('/api/posts/create', {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+
+            const result = await res.json()
+
+            if (!result.success) throw new Error(result.message)
+
+            return result
+        },
+        onSuccess: () => {
+            setText('')
+            setImg(null)
+            toast.success('Post Created')
+            queryClient.invalidateQueries({ queryKey: ['posts', 'forYou'] })
+        },
+        onError: (error) => {
+            toast.error(error.message)
+        }
+
+    })
+
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        alert("Post created successfully");
+        createPost({ text, img })
     };
 
     const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +65,7 @@ const CreatePost = () => {
         <div className='flex p-4 items-start gap-4 border-b border-gray-700'>
             <div className='avatar'>
                 <div className='w-8 rounded-full'>
-                    <img src={data.profileImg || "/avatar-placeholder.png"} />
+                    <img src={user.profileImg || "/avatar-placeholder.png"} />
                 </div>
             </div>
             <form className='flex flex-col gap-2 w-full' onSubmit={handleSubmit}>
@@ -74,7 +101,6 @@ const CreatePost = () => {
                         {isPending ? "Posting..." : "Post"}
                     </button>
                 </div>
-                {isError && <div className='text-red-500'>Something went wrong</div>}
             </form>
         </div>
     );

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const createPostDto = z.object({
     text: z.string().optional(),
-    image: z.string().optional(), // Assuming image is a URL or base64 string
+    image: z.string().optional(),
 }).refine(data => data.text || data.image, {
     message: "Either text or image is required.",
     path: ["text", "image"],

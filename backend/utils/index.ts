@@ -1,34 +1,15 @@
 import { NextFunction, Response } from "express";
 import { ApiError, ApiSuccessResponse } from "./ApiResponses";
 import { ZodError } from "zod";
-import { v2 as cloudinary } from 'cloudinary'
 import mongoose from "mongoose";
 import { RequestWithUser } from "../types";
 
 
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-})
-
-
-const uploadToCloudinary = async (file: any) => {
-    return await cloudinary.uploader.upload(file)
-}
-
-const deleteFromCloudinary = async (url: string) => {
-    const urlArray = url.split('/')
-
-    const publicId = urlArray[urlArray.length - 1].split('.')[0]
-
-    return await cloudinary.uploader.destroy(publicId)
-}
-
 const asyncHandler = (fn: (req: RequestWithUser, res: Response, next: NextFunction) => any) => (req: RequestWithUser, res: Response, next: NextFunction) => Promise.resolve(fn(req, res, next)).catch(next);
 
-
 function globalErrorHandler(err: any, _req: RequestWithUser, res: Response, _next: NextFunction) {
+
+    console.log(err)
 
     // Error thrown by us
     if (err instanceof ApiError) {
@@ -72,4 +53,4 @@ const stringToObjectId = (id: string) => {
 }
 
 
-export { asyncHandler, globalErrorHandler, stringToObjectId, ApiError, ApiSuccessResponse, uploadToCloudinary, deleteFromCloudinary }
+export { asyncHandler, globalErrorHandler, stringToObjectId, ApiError, ApiSuccessResponse }

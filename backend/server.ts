@@ -28,8 +28,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
 
-// TODO like unlike post by user,followers and following
-
 app.use('/api/auth', authRoutes)
 app.use('/api/users', forLoggedInUsers, userRoutes)
 app.use('/api/posts', forLoggedInUsers, postRoutes)

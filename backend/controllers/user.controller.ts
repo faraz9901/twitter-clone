@@ -1,9 +1,10 @@
 import { Types } from "mongoose";
 import User from "../models/user.model";
-import { ApiError, ApiSuccessResponse, asyncHandler, deleteFromCloudinary, uploadToCloudinary } from "../utils";
+import { ApiError, ApiSuccessResponse, asyncHandler } from "../utils";
 import Notification from "../models/notification.model";
 import { NotificationTypes } from "../utils/enums";
 import { updateUserDto } from "../utils/validation-dtos/user.dto";
+import { deleteFromCloudinary, uploadToCloudinary } from "../utils/cloudinary";
 
 export const getUserProfile = asyncHandler(async (req, res) => {
 
@@ -13,7 +14,7 @@ export const getUserProfile = asyncHandler(async (req, res) => {
 
     if (!user) throw new ApiError('User not found', 404);
 
-    return res.status(200).json(new ApiSuccessResponse('User found', user));
+    return res.status(200).json(new ApiSuccessResponse('User fetched successfully', user));
 
 })
 
@@ -126,6 +127,8 @@ export const updateUser = asyncHandler(async (req, res) => {
     }
 
     const updatedUser = await user.save()
+
+    if (!updatedUser) throw new ApiError('User could not be updated', 500);
 
     return res.status(200).json(new ApiSuccessResponse('User updated successfully'));
 })

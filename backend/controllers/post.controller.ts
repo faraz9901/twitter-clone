@@ -1,13 +1,15 @@
-import exp from "constants";
 import Post from "../models/post.model";
 import User from "../models/user.model";
-import { ApiError, ApiSuccessResponse, asyncHandler, deleteFromCloudinary, uploadToCloudinary } from "../utils";
+import { ApiError, ApiSuccessResponse, asyncHandler } from "../utils";
 import { commentDto, createPostDto } from "../utils/validation-dtos/post.dto";
 import { Types } from "mongoose";
 import Notification from "../models/notification.model";
 import { NotificationTypes } from "../utils/enums";
+import { deleteFromCloudinary, uploadToCloudinary } from "../utils/cloudinary";
 
 export const createPost = asyncHandler(async (req, res) => {
+
+    if (req.file) req.body.image = req.file.path // adding the path to the body of the request
 
     const validatedBody = createPostDto.parse(req.body);
 
