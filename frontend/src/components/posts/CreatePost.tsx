@@ -1,26 +1,29 @@
-import { BookImage, Smile, X } from "lucide-react";
+import { Paperclip, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { useAuth } from "../../context/User.Context";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-
+import { imageCompressor } from "../../utils/imageCompressor";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 const CreatePost = () => {
-    const [text, setText] = useState("");
-    const [img, setImg] = useState<string | null>(null);
     const { user } = useAuth()
-    const imgRef = useRef<HTMLInputElement | null>(null);
+    const [text, setText] = useState("");
+    const [image, setImage] = useState<Blob | null>(null);
+    const imageRef = useRef<HTMLInputElement | null>(null);
     const queryClient = useQueryClient()
+    const [isProcessing, setIsProcessing] = useState(false)
 
     const { mutate: createPost, isPending } = useMutation({
-        mutationFn: async (data: { text: string, img: any }) => {
+        mutationFn: async (data: { text: string, image: Blob | null }) => {
+
+            const formData = new FormData()
+            formData.append('text', data.text)
+            if (data.image) formData.append('image', data.image)
 
             const res = await fetch('/api/posts/create', {
                 method: 'POST',
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                body: formData,
             })
 
             const result = await res.json()
@@ -31,33 +34,34 @@ const CreatePost = () => {
         },
         onSuccess: () => {
             setText('')
-            setImg(null)
+            setImage(null)
             toast.success('Post Created')
+            // as following posts will not include the user posts
             queryClient.invalidateQueries({ queryKey: ['posts', 'forYou'] })
         },
         onError: (error) => {
             toast.error(error.message)
         }
-
     })
 
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        createPost({ text, img })
+        createPost({ text, image })
     };
 
-    const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-
+    const handleimageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files === null) return;
-
         const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                setImg(reader.result as string);
-            };
-            reader.readAsDataURL(file);
+        setIsProcessing(true)
+        try {
+            const compressedImage = await imageCompressor(file)
+            if (!compressedImage) return toast.error('Invalid Image Format')
+            setImage(compressedImage)
+        } catch (error) {
+            toast.error('Failed to process image')
+        } finally {
+            setIsProcessing(false)
         }
     };
 
@@ -65,7 +69,7 @@ const CreatePost = () => {
         <div className='flex p-4 items-start gap-4 border-b border-gray-700'>
             <div className='avatar'>
                 <div className='w-8 rounded-full'>
-                    <img src={user.profileImg || "/avatar-placeholder.png"} />
+                    <img src={user?.profileImg || "/avatar-placeholder.png"} />
                 </div>
             </div>
             <form className='flex flex-col gap-2 w-full' onSubmit={handleSubmit}>
@@ -75,29 +79,29 @@ const CreatePost = () => {
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                 />
-                {img && (
+                {image && (
                     <div className='relative w-72 mx-auto'>
                         <X
                             className='absolute top-0 right-0 text-white bg-gray-800 rounded-full w-5 h-5 cursor-pointer'
                             onClick={() => {
-                                setImg(null);
-                                if (imgRef?.current) imgRef.current.value = "";
+                                setImage(null);
+                                if (imageRef.current) imageRef.current.value = "";
                             }}
                         />
-                        <img src={img} className='w-full mx-auto h-72 object-contain rounded' />
+                        <img src={URL.createObjectURL(image)} className='w-full mx-auto h-72 object-contain rounded' />
                     </div>
                 )}
 
-                <div className='flex justify-between border-t py-2 border-t-gray-700'>
+                <div className='flex justify-between py-2 border-t-gray-700'>
                     <div className='flex gap-1 items-center'>
-                        <BookImage
-                            className='fill-primary w-6 h-6 cursor-pointer'
-                            onClick={() => imgRef.current?.click()}
+                        <Paperclip
+                            className='w-6 h-6 cursor-pointer'
+                            onClick={() => imageRef.current?.click()}
                         />
-                        <Smile className='fill-primary w-5 h-5 cursor-pointer' />
                     </div>
-                    <input type='file' hidden ref={imgRef} onChange={handleImgChange} />
-                    <button className='btn btn-primary rounded-full btn-sm text-white px-4'>
+                    <input type='file' hidden ref={imageRef} onChange={handleimageChange} />
+                    <button disabled={isPending || isProcessing} className='btn btn-primary rounded-full btn-sm text-white px-4'>
+                        {isProcessing && <LoadingSpinner size="sm" />}
                         {isPending ? "Posting..." : "Post"}
                     </button>
                 </div>

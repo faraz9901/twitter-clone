@@ -38,12 +38,10 @@ const Post = ({ post }: PostProps) => {
         }
     })
 
-
-
     const postOwner = post.user; 1
     const isLiked = false;
 
-    const isMyPost = user._id === post.user._id;
+    const isMyPost = user?._id === post.user._id;
 
     const formattedDate = "1h";
 
@@ -68,7 +66,7 @@ const Post = ({ post }: PostProps) => {
                 <div className='flex flex-col flex-1'>
                     <div className='flex gap-2 items-center'>
                         <Link to={`/profile/${postOwner.username}`} className='font-bold'>
-                            {postOwner.fullName}
+                            {postOwner.fullname}
                         </Link>
                         <span className='text-gray-700 flex gap-1 text-sm'>
                             <Link to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>
@@ -79,15 +77,15 @@ const Post = ({ post }: PostProps) => {
                             <span className='flex justify-end flex-1'>
                                 {isPending ?
                                     <LoadingSpinner size="sm" /> :
-                                    <Trash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />}
+                                    <Trash className='cursor-pointer hover:fill-red-500' onClick={handleDeletePost} />}
                             </span>
                         )}
                     </div>
                     <div className='flex flex-col gap-3 overflow-hidden'>
                         <span>{post.text}</span>
-                        {post.img && (
+                        {post.image && (
                             <img
-                                src={post.img}
+                                src={post.image}
                                 className='h-80 object-contain rounded-lg border border-gray-700'
                                 alt=''
                             />
@@ -97,8 +95,7 @@ const Post = ({ post }: PostProps) => {
                         <div className='flex gap-4 items-center w-2/3 justify-between'>
                             <div
                                 className='flex gap-1 items-center cursor-pointer group'
-                                //@ts-ignore
-                                onClick={() => document.getElementById("comments_modal" + post._id).showModal()}
+                                onClick={() => (document.getElementById("comments_modal" + post._id) as HTMLDialogElement).showModal()}
                             >
                                 <MessageSquare className='w-4 h-4  text-slate-500 group-hover:text-sky-400' />
                                 <span className='text-sm text-slate-500 group-hover:text-sky-400'>
@@ -112,7 +109,7 @@ const Post = ({ post }: PostProps) => {
                                     <div className='flex flex-col gap-3 max-h-60 overflow-auto'>
                                         {post.comments.length === 0 && (
                                             <p className='text-sm text-slate-500'>
-                                                No comments yet 🤔 Be the first one 😉
+                                                No comments yet ! Be the first one
                                             </p>
                                         )}
                                         {post.comments.map((comment: any) => (
@@ -169,10 +166,7 @@ const Post = ({ post }: PostProps) => {
                                 )}
                                 {isLiked && <Heart className='w-4 h-4 cursor-pointer text-pink-500 ' />}
 
-                                <span
-                                    className={`text-sm text-slate-500 group-hover:text-pink-500 ${isLiked ? "text-pink-500" : ""
-                                        }`}
-                                >
+                                <span className={`text-sm text-slate-500 group-hover:text-pink-500 ${isLiked ? "text-pink-500" : ""}`} >
                                     {post.likes.length}
                                 </span>
                             </div>

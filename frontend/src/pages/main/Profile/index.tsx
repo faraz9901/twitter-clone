@@ -6,29 +6,23 @@ import { POSTS } from "../../../data";
 import Posts from "../../../components/posts/Posts";
 import { CalendarDays, Link as Link2, MoveLeft, Pencil } from "lucide-react";
 import EditProfileModal from "./EditProfile";
+import { useAuth } from "../../../context/User.Context";
 
 const ProfilePage = () => {
+    const { user: CurrentUser } = useAuth()
+
+    const user = CurrentUser
+
     const [coverImg, setCoverImg] = useState<string | null>(null);
     const [profileImg, setProfileImg] = useState<string | null>(null);
     const [feedType, setFeedType] = useState("posts");
-
     const coverImgRef = useRef<HTMLInputElement | null>(null);
     const profileImgRef = useRef<HTMLInputElement | null>(null);
 
     const isLoading = false;
     const isMyProfile = true;
 
-    const user = {
-        _id: "1",
-        fullName: "John Doe",
-        username: "johndoe",
-        profileImg: "/avatars/boy2.png",
-        coverImg: "/cover.png",
-        bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        link: "https://youtube.com/@asaprogrammer_",
-        following: ["1", "2", "3"],
-        followers: ["1", "2", "3"],
-    };
+
 
     const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>, state: "coverImg" | "profileImg") => {
 
@@ -62,7 +56,7 @@ const ProfilePage = () => {
                                     <MoveLeft className='w-4 h-4' />
                                 </Link>
                                 <div className='flex flex-col'>
-                                    <p className='font-bold text-lg'>{user?.fullName}</p>
+                                    <p className='font-bold text-lg'>{user?.fullname}</p>
                                     <span className='text-sm text-slate-500'>{POSTS?.length} posts</span>
                                 </div>
                             </div>
@@ -110,7 +104,7 @@ const ProfilePage = () => {
                                 </div>
                             </div>
                             <div className='flex justify-end px-4 mt-5'>
-                                {isMyProfile && <EditProfileModal />}
+                                {isMyProfile && <EditProfileModal user={user} />}
                                 {!isMyProfile && (
                                     <button
                                         className='btn btn-outline rounded-full btn-sm'
@@ -131,7 +125,7 @@ const ProfilePage = () => {
 
                             <div className='flex flex-col gap-4 mt-14 px-4'>
                                 <div className='flex flex-col'>
-                                    <span className='font-bold text-lg'>{user?.fullName}</span>
+                                    <span className='font-bold text-lg'>{user?.fullname}</span>
                                     <span className='text-sm text-slate-500'>@{user?.username}</span>
                                     <span className='text-sm my-1'>{user?.bio}</span>
                                 </div>
@@ -142,12 +136,12 @@ const ProfilePage = () => {
                                             <>
                                                 <Link2 className='w-3 h-3 text-slate-500' />
                                                 <a
-                                                    href='https://youtube.com/@asaprogrammer_'
+                                                    href={user?.link}
                                                     target='_blank'
                                                     rel='noreferrer'
                                                     className='text-sm text-blue-500 hover:underline'
                                                 >
-                                                    youtube.com/@asaprogrammer_
+                                                    {user?.link}
                                                 </a>
                                             </>
                                         </div>
@@ -191,7 +185,7 @@ const ProfilePage = () => {
                         </>
                     )}
 
-                    <Posts />
+                    <Posts feedType="forYou" />
                 </div>
             </div>
         </>

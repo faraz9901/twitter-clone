@@ -9,8 +9,6 @@ const asyncHandler = (fn: (req: RequestWithUser, res: Response, next: NextFuncti
 
 function globalErrorHandler(err: any, _req: RequestWithUser, res: Response, _next: NextFunction) {
 
-    console.log(err)
-
     // Error thrown by us
     if (err instanceof ApiError) {
         return res.status(err.statusCode).json({

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
 // Layouts
@@ -16,9 +16,10 @@ import NotFound from "./pages/NotFound";
 
 //context
 import { UserContext } from "./context/User.Context";
+import { User } from "./types";
 
 function App() {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<User | null>(null)
 
   const router = createBrowserRouter(
     createRoutesFromElements(

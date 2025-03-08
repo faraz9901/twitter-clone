@@ -1,12 +1,13 @@
 import { useState } from "react";
+import { User } from "../../../types";
 
-const EditProfileModal = () => {
+const EditProfileModal = ({ user }: { user: User }) => {
     const [formData, setFormData] = useState({
-        fullName: "",
-        username: "",
-        email: "",
-        bio: "",
-        link: "",
+        fullname: user.fullname,
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        link: user.link,
         newPassword: "",
         currentPassword: "",
     });
@@ -17,13 +18,9 @@ const EditProfileModal = () => {
 
     return (
         <>
-            <button
-                className='btn btn-outline rounded-full btn-sm'
-                //@ts-ignore
-                onClick={() => document.getElementById("edit_profile_modal").showModal()}
-            >
+            <button className='btn btn-outline rounded-full btn-sm' onClick={() => (document.getElementById("edit_profile_modal") as HTMLDialogElement).showModal()}>
                 Edit profile
-            </button>
+            </button >
             <dialog id='edit_profile_modal' className='modal'>
                 <div className='modal-box border rounded-md border-gray-700 shadow-md'>
                     <h3 className='font-bold text-lg my-3'>Update Profile</h3>
@@ -39,8 +36,8 @@ const EditProfileModal = () => {
                                 type='text'
                                 placeholder='Full Name'
                                 className='flex-1 input border border-gray-700 rounded p-2 input-md'
-                                value={formData.fullName}
-                                name='fullName'
+                                value={formData.fullname}
+                                name='fullname'
                                 onChange={handleInputChange}
                             />
                             <input

@@ -13,10 +13,6 @@ export const createPost = asyncHandler(async (req, res) => {
 
     const validatedBody = createPostDto.parse(req.body);
 
-    const user = await User.findById(req.user.id);
-
-    if (!user) throw new ApiError('User not found', 404);
-
     let uploadedImage: string | null = null;
 
     if (validatedBody.image) {
@@ -26,14 +22,14 @@ export const createPost = asyncHandler(async (req, res) => {
     }
 
     const post = new Post({
-        user: user._id,
+        user: req.user.id,
         text: validatedBody.text,
         image: uploadedImage,
     })
 
     await post.save();
 
-    return res.status(201).json(new ApiSuccessResponse('Post created successfully', post));
+    return res.status(201).json(new ApiSuccessResponse('Post created successfully'));
 })
 
 
