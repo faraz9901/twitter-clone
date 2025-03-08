@@ -80,6 +80,16 @@ export const updateUser = asyncHandler(async (req, res) => {
 
     const { id } = req.user;
 
+    // if profile image is uploaded
+    if (req.files && (req.files as any).profileImg) {
+        req.body.profileImg = (req.files as any).profileImg[0].path;
+    }
+
+    // if cover image is uploaded
+    if (req.files && (req.files as any).coverImg) {
+        req.body.coverImg = (req.files as any).coverImg[0].path;
+    }
+
     const validatedBody = updateUserDto.parse(req.body);
 
     const user = await User.findById(id);
@@ -110,7 +120,7 @@ export const updateUser = asyncHandler(async (req, res) => {
 
         const profileImg = await uploadToCloudinary(validatedBody.profileImg)
 
-        user.profileImg = profileImg.secure_url;
+        user.profileImg = profileImg?.secure_url || user.profileImg;
     }
 
     if (validatedBody.coverImg) {
@@ -123,7 +133,7 @@ export const updateUser = asyncHandler(async (req, res) => {
 
         const coverImg = await uploadToCloudinary(validatedBody.coverImg)
 
-        user.coverImg = coverImg.secure_url;
+        user.coverImg = coverImg?.secure_url || user.coverImg;
     }
 
     const updatedUser = await user.save()

@@ -22,7 +22,7 @@ export const createPost = asyncHandler(async (req, res) => {
     if (validatedBody.image) {
         // upload image to cloudinary
         const result = await uploadToCloudinary(validatedBody.image);
-        uploadedImage = result.secure_url
+        uploadedImage = result?.secure_url || null
     }
 
     const post = new Post({

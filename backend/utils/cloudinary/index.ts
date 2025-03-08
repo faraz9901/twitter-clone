@@ -1,6 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary'
-import * as fs from 'fs';
-import { ApiError } from '../ApiResponses';
+import * as fs from 'fs/promises';
 
 const uploadToCloudinary = async (filePath: string) => {
 
@@ -11,13 +10,13 @@ const uploadToCloudinary = async (filePath: string) => {
     })
 
     try {
-        const uploadedImage = await cloudinary.uploader.upload(filePath)
-        return uploadedImage
+        return await cloudinary.uploader.upload(filePath)
     } catch (error) {
-        throw new ApiError('Error uploading image to cloudinary', 500)
+        console.log(error)
+        return null
     } finally {
         // delete the file from the server
-        fs.unlinkSync(filePath);
+        fs.unlink(filePath);
     }
 }
 
