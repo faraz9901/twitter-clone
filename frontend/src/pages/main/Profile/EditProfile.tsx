@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { User } from "../../../types";
+import useUpdateProfile from "../../../hooks/useUpdateProfile";
 
 const EditProfileModal = ({ user }: { user: User }) => {
+    const { update, isPending } = useUpdateProfile({
+        onUpdateSuccess: () => {
+            (document.getElementById('edit_profile_modal') as HTMLDialogElement).close()
+            setFormData({ ...formData, newPassword: "", currentPassword: "" })
+        }
+    })
+
     const [formData, setFormData] = useState({
         fullname: user.fullname,
         username: user.username,
@@ -28,7 +36,7 @@ const EditProfileModal = ({ user }: { user: User }) => {
                         className='flex flex-col gap-4'
                         onSubmit={(e) => {
                             e.preventDefault();
-                            alert("Profile updated successfully");
+                            update(formData)
                         }}
                     >
                         <div className='flex flex-wrap gap-2'>
@@ -45,19 +53,12 @@ const EditProfileModal = ({ user }: { user: User }) => {
                                 placeholder='Username'
                                 className='flex-1 input border border-gray-700 rounded p-2 input-md'
                                 value={formData.username}
+                                disabled
                                 name='username'
                                 onChange={handleInputChange}
                             />
                         </div>
                         <div className='flex flex-wrap gap-2'>
-                            <input
-                                type='email'
-                                placeholder='Email'
-                                className='flex-1 input border border-gray-700 rounded p-2 input-md'
-                                value={formData.email}
-                                name='email'
-                                onChange={handleInputChange}
-                            />
                             <textarea
                                 placeholder='Bio'
                                 className='flex-1 input border border-gray-700 rounded p-2 input-md'
@@ -85,14 +86,16 @@ const EditProfileModal = ({ user }: { user: User }) => {
                             />
                         </div>
                         <input
-                            type='text'
+                            type='url'
                             placeholder='Link'
-                            className='flex-1 input border border-gray-700 rounded p-2 input-md'
+                            className='flex-1 w-full input border border-gray-700 rounded p-2 input-md'
                             value={formData.link}
                             name='link'
                             onChange={handleInputChange}
                         />
-                        <button className='btn btn-primary rounded-full btn-sm text-white'>Update</button>
+                        <button disabled={isPending} className='btn btn-primary rounded-full btn-sm text-white'>
+                            {isPending ? '...Updating' : 'Update'}
+                        </button>
                     </form>
                 </div>
                 <form method='dialog' className='modal-backdrop'>

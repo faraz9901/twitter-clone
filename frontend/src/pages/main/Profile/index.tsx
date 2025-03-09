@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import ProfileSkeleton from "../../../components/common/skeletons/ProfileSkeleton";
 import { POSTS } from "../../../data";
@@ -7,45 +7,63 @@ import Posts from "../../../components/posts/Posts";
 import { CalendarDays, Link as Link2, MoveLeft, Pencil } from "lucide-react";
 import EditProfileModal from "./EditProfile";
 import { useAuth } from "../../../context/User.Context";
+import { useQuery } from "@tanstack/react-query";
+import { getJoinedDate } from "../../../utils";
+import toast from "react-hot-toast";
+import { imageCompressor } from "../../../utils/imageCompressor";
+import useUpdateProfile from "../../../hooks/useUpdateProfile";
 
 const ProfilePage = () => {
     const { user: CurrentUser } = useAuth()
+    const { username } = useParams()
 
-    const user = CurrentUser
+    const { update, isPending } = useUpdateProfile({
+        onUpdateSuccess: () => {
+            setCoverImg(null)
+            setProfileImg(null)
+        }
+    })
 
-    const [coverImg, setCoverImg] = useState<string | null>(null);
-    const [profileImg, setProfileImg] = useState<string | null>(null);
+
+    const { data: user, isLoading } = useQuery({
+        queryKey: ['user', username],
+        queryFn: async () => {
+            const res = await fetch(`/api/users/profile/${username}`)
+            const result = await res.json()
+            if (!result.success) return null
+            return result.data
+        }
+    })
+
+
+    const [coverImg, setCoverImg] = useState<Blob | null>(null);
+    const [profileImg, setProfileImg] = useState<Blob | null>(null);
     const [feedType, setFeedType] = useState("posts");
     const coverImgRef = useRef<HTMLInputElement | null>(null);
     const profileImgRef = useRef<HTMLInputElement | null>(null);
 
-    const isLoading = false;
-    const isMyProfile = true;
+    const isMyProfile = CurrentUser?._id === user?._id;
+    const coverImageLink = coverImg ? URL.createObjectURL(coverImg) : ""
+    const profileImageLink = profileImg ? URL.createObjectURL(profileImg) : ""
 
-
-
-    const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>, state: "coverImg" | "profileImg") => {
-
-        if (!e.target.files) return;
-
+    const handleImgChange = async (e: React.ChangeEvent<HTMLInputElement>, state: "coverImg" | "profileImg") => {
+        if (e.target.files === null) return;
         const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-
-                const result = reader.result as string;
-
-                state === "coverImg" && setCoverImg(result);
-                state === "profileImg" && setProfileImg(result);
-            };
-            reader.readAsDataURL(file);
+        try {
+            const toastId = toast.loading('Processing image...')
+            const compressedImage = await imageCompressor(file)
+            if (!compressedImage) return toast.error('Invalid Image Format')
+            const setImage = state === "coverImg" ? setCoverImg : setProfileImg
+            setImage(compressedImage)
+            toast.dismiss(toastId)
+        } catch (error) {
+            toast.error('Failed to process image')
         }
     };
 
     return (
         <>
             <div className='flex-[4_4_0]  border-r border-gray-700 min-h-screen '>
-                {/* HEADER */}
                 {isLoading && <ProfileSkeleton />}
                 {!isLoading && !user && <p className='text-center text-lg mt-4'>User not found</p>}
                 <div className='flex flex-col'>
@@ -63,7 +81,7 @@ const ProfilePage = () => {
                             {/* COVER IMG */}
                             <div className='relative group/cover'>
                                 <img
-                                    src={coverImg || user?.coverImg || "/cover.png"}
+                                    src={coverImageLink || user?.coverImg || "/cover.png"}
                                     className='h-52 w-full object-cover'
                                     alt='cover image'
                                 />
@@ -91,7 +109,7 @@ const ProfilePage = () => {
                                 {/* USER AVATAR */}
                                 <div className='avatar absolute -bottom-16 left-4'>
                                     <div className='w-32 rounded-full relative group/avatar'>
-                                        <img src={profileImg || user?.profileImg || "/avatar-placeholder.png"} />
+                                        <img src={profileImageLink || user?.profileImg || "/avatar-placeholder.png"} />
                                         <div className='absolute top-5 right-3 p-1 bg-primary rounded-full group-hover/avatar:opacity-100 opacity-0 cursor-pointer'>
                                             {isMyProfile && (
                                                 <Pencil
@@ -115,10 +133,12 @@ const ProfilePage = () => {
                                 )}
                                 {(coverImg || profileImg) && (
                                     <button
+                                        type="button"
+                                        disabled={isPending}
                                         className='btn btn-primary rounded-full btn-sm text-white px-4 ml-2'
-                                        onClick={() => alert("Profile updated successfully")}
+                                        onClick={() => update({ coverImg, profileImg })}
                                     >
-                                        Update
+                                        {isPending ? "Updating..." : 'Update'}
                                     </button>
                                 )}
                             </div>
@@ -148,7 +168,7 @@ const ProfilePage = () => {
                                     )}
                                     <div className='flex gap-2 items-center'>
                                         <CalendarDays className='w-4 h-4 text-slate-500' />
-                                        <span className='text-sm text-slate-500'>Joined July 2021</span>
+                                        <span className='text-sm text-slate-500'>Joined {getJoinedDate(user?.createdAt || "")}</span>
                                     </div>
                                 </div>
                                 <div className='flex gap-2'>
@@ -182,10 +202,10 @@ const ProfilePage = () => {
                                     )}
                                 </div>
                             </div>
+                            <Posts feedType="forYou" />
                         </>
                     )}
 
-                    <Posts feedType="forYou" />
                 </div>
             </div>
         </>

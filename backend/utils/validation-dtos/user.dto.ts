@@ -6,8 +6,12 @@ const updateUserDto = z.object({
     link: z.string().optional(),
     profileImg: z.string().optional(),
     coverImg: z.string().optional(),
-    currentPassword: z.string().min(6, { message: "Password must be at least 6 characters" }).optional(),
-    newPassword: z.string().min(6, { message: "Password must be at least 6 characters" }).optional(),
+    currentPassword: z.string().trim().optional().refine(value => !value || (value?.length && value.length >= 6), {
+        message: "Current Password must be atleast 6 characters long"
+    }),
+    newPassword: z.string().trim().optional().refine(value => !value || (value?.length && value.length >= 6), {
+        message: "New Password must be atleast 6 characters long"
+    })
 })
 
 

@@ -17,4 +17,13 @@ function timeAgo(date: string | Date) {
     }
 }
 
-export { timeAgo };
+
+
+function getJoinedDate(date: string) {
+    if (!date) return null
+    const joinedDate = new Date(date);
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+    return joinedDate.toLocaleDateString('en-US', options);
+}
+
+export { timeAgo, getJoinedDate };
