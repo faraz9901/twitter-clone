@@ -17,6 +17,7 @@ import useFollow from "../../../hooks/useFollow";
 const ProfilePage = () => {
     const { user: CurrentUser } = useAuth()
     const { username } = useParams()
+    const [feedType, setFeedType] = useState<"userPosts" | "likes">("userPosts")
 
     const { follow, isPending: isFollowing } = useFollow()
 
@@ -41,7 +42,6 @@ const ProfilePage = () => {
 
     const [coverImg, setCoverImg] = useState<Blob | null>(null);
     const [profileImg, setProfileImg] = useState<Blob | null>(null);
-    const [feedType, setFeedType] = useState("posts");
     const coverImgRef = useRef<HTMLInputElement | null>(null);
     const profileImgRef = useRef<HTMLInputElement | null>(null);
 
@@ -189,10 +189,10 @@ const ProfilePage = () => {
                             <div className='flex w-full border-b border-gray-700 mt-4'>
                                 <div
                                     className='flex justify-center flex-1 p-3 hover:bg-secondary transition duration-300 relative cursor-pointer'
-                                    onClick={() => setFeedType("posts")}
+                                    onClick={() => setFeedType("userPosts")}
                                 >
                                     Posts
-                                    {feedType === "posts" && (
+                                    {feedType === "userPosts" && (
                                         <div className='absolute bottom-0 w-10 h-1 rounded-full bg-primary' />
                                     )}
                                 </div>
@@ -206,7 +206,7 @@ const ProfilePage = () => {
                                     )}
                                 </div>
                             </div>
-                            <Posts feedType="forYou" />
+                            <Posts feedType={feedType} user={user} />
                         </>
                     )}
 

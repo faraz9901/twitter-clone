@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { commentOnPost, createPost, deletePost, getAllPosts, getFollowingPosts, getUserLikedPosts, getUserPost, likeUnlikePost } from '../controllers/post.controller';
+import { commentOnPost, createPost, deletePost, getAllPosts, getFollowingPosts, getUserLikedPosts, getUserPosts, likeUnlikePost } from '../controllers/post.controller';
 import { upload } from '../utils/uploadToMulter';
 
 const router = Router()
@@ -16,7 +16,7 @@ router.put('/like/:id', likeUnlikePost)
 
 router.get('/likes/:id', getUserLikedPosts)
 
-router.get('/:username', getUserPost)
+router.get('/:username', getUserPosts)
 
 router.delete('/:id', deletePost)
 

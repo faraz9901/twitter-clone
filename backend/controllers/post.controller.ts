@@ -130,7 +130,13 @@ export const getUserLikedPosts = asyncHandler(async (req, res) => {
 
     const { id: userId } = req.params;
 
-    const user = await User.findById(userId).populate('likedPosts');
+    const user = await User.findById(userId).populate({
+        path: 'likedPosts',
+        populate: {
+            path: 'user',
+            select: 'username fullname profileImg'
+        }
+    });
 
     if (!user) throw new ApiError('User not found', 404);
 
@@ -154,7 +160,7 @@ export const getFollowingPosts = asyncHandler(async (req, res) => {
 })
 
 
-export const getUserPost = asyncHandler(async (req, res) => {
+export const getUserPosts = asyncHandler(async (req, res) => {
 
     const { username } = req.params;
 
@@ -162,7 +168,7 @@ export const getUserPost = asyncHandler(async (req, res) => {
 
     if (!user) throw new ApiError('User not found', 404);
 
-    const posts = await Post.find({ user: user._id }).sort({ createdAt: -1 })
+    const posts = await Post.find({ user: user._id }).sort({ createdAt: -1 }).populate('user', 'username fullname profileImg')
 
     return res.status(200).json(new ApiSuccessResponse('Posts fetched successfully', posts));
 })

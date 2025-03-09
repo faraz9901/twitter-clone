@@ -153,7 +153,7 @@ const SinglePost = ({ post }: PostProps) => {
                                         </p>
                                     )}
                                     {post.comments.map((comment: any) => (
-                                        <div key={comment._id} className='flex gap-2 items-start'>
+                                        <div key={comment._id} className='flex gap-2 items-start border-b border-gray-600 py-2'>
                                             <div className='avatar'>
                                                 <div className='w-8 rounded-full'>
                                                     <img

@@ -8,9 +8,9 @@ export const getNotifications = asyncHandler(async (req, res) => {
     userId = stringToObjectId(userId);
 
     // mark all notifications as read
-    await Notification.updateMany({ to: userId }, { $set: { isRead: true } }, { new: true });
+    await Notification.updateMany({ to: userId }, { $set: { isRead: true } });
 
-    const notifications = await Notification.find({ to: userId }).sort({ createdAt: -1 });
+    const notifications = await Notification.find({ to: userId }).sort({ createdAt: -1 }).populate('from', 'profileImg username');
 
     return res.status(200).json(new ApiSuccessResponse('Notifications fetched successfully', notifications));
 })
