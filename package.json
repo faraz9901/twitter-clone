@@ -9,7 +9,7 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/server.js",
-    "dev": "nodemon backend/server.ts"
+    "dev": "nodemon --watch backend --ignore frontend backend/server.ts"
   },
   "dependencies": {
     "argon2": "^0.41.1",

@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+
 import Skeleton from "./skeletons/RightPanelSkeleton";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
 import { User } from "../../types";
+import useFollow from "../../hooks/useFollow";
 
 const RightPanel = () => {
-    const queryClient = useQueryClient()
+    const { follow, isPending } = useFollow()
+
     const { data: users, isLoading } = useQuery({
         queryKey: ['suggested'],
         queryFn: async () => {
@@ -17,27 +19,6 @@ const RightPanel = () => {
 
             return result.data
         }
-    })
-
-
-    const { mutate: follow, isPending } = useMutation({
-        mutationFn: async (username: string) => {
-            const res = await fetch(`/api/users/follow/${username}`, {
-                method: "POST",
-            })
-            const result = await res.json()
-            if (!result.success) throw new Error(result.message)
-            return result
-        },
-
-        onError: (error) => {
-            toast.error(error.message)
-        },
-
-        onSuccess: () => {
-            toast.success('Followed successfully')
-            queryClient.invalidateQueries({ queryKey: ['suggested'] })
-        },
     })
 
     return (

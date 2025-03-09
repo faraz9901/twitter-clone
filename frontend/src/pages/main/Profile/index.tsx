@@ -12,10 +12,13 @@ import { getJoinedDate } from "../../../utils";
 import toast from "react-hot-toast";
 import { imageCompressor } from "../../../utils/imageCompressor";
 import useUpdateProfile from "../../../hooks/useUpdateProfile";
+import useFollow from "../../../hooks/useFollow";
 
 const ProfilePage = () => {
     const { user: CurrentUser } = useAuth()
     const { username } = useParams()
+
+    const { follow, isPending: isFollowing } = useFollow()
 
     const { update, isPending } = useUpdateProfile({
         onUpdateSuccess: () => {
@@ -125,10 +128,11 @@ const ProfilePage = () => {
                                 {isMyProfile && <EditProfileModal user={user} />}
                                 {!isMyProfile && (
                                     <button
+                                        disabled={isFollowing}
                                         className='btn btn-outline rounded-full btn-sm'
-                                        onClick={() => alert("Followed successfully")}
+                                        onClick={() => follow(user.username)}
                                     >
-                                        Follow
+                                        {CurrentUser?.following.includes(user._id) ? 'Unfollow' : 'Follow'}
                                     </button>
                                 )}
                                 {(coverImg || profileImg) && (

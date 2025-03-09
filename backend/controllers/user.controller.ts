@@ -55,7 +55,7 @@ export const followUser = asyncHandler(async (req, res) => {
         await notification.save();
     }
 
-    return res.status(200).json(new ApiSuccessResponse(`User ${isFollowing ? 'unfollowed' : 'followed'}`))
+    return res.status(200).json(new ApiSuccessResponse(`You ${isFollowing ? 'unfollowed' : 'followed'} ${username}`))
 })
 
 
