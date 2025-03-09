@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import Skeleton from "./skeletons/RightPanelSkeleton";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { User } from "../../types";
 
 const RightPanel = () => {
+    const queryClient = useQueryClient()
     const { data: users, isLoading } = useQuery({
         queryKey: ['suggested'],
         queryFn: async () => {
@@ -16,6 +19,26 @@ const RightPanel = () => {
         }
     })
 
+
+    const { mutate: follow, isPending } = useMutation({
+        mutationFn: async (username: string) => {
+            const res = await fetch(`/api/users/follow/${username}`, {
+                method: "POST",
+            })
+            const result = await res.json()
+            if (!result.success) throw new Error(result.message)
+            return result
+        },
+
+        onError: (error) => {
+            toast.error(error.message)
+        },
+
+        onSuccess: () => {
+            toast.success('Followed successfully')
+            queryClient.invalidateQueries({ queryKey: ['suggested'] })
+        },
+    })
 
     return (
         <div className='hidden lg:block my-4 mx-2'>
@@ -32,7 +55,7 @@ const RightPanel = () => {
                         </>
                     )}
                     {!isLoading &&
-                        users?.map((user: any) => (
+                        users?.map((user: User) => (
                             <Link
                                 to={`/profile/${user.username}`}
                                 className='flex items-center justify-between gap-4'
@@ -53,10 +76,14 @@ const RightPanel = () => {
                                 </div>
                                 <div>
                                     <button
+                                        disabled={isPending}
                                         className='btn bg-white text-black hover:bg-white hover:opacity-90 rounded-full btn-sm'
-                                        onClick={(e) => e.preventDefault()}
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            follow(user.username)
+                                        }}
                                     >
-                                        Follow
+                                        {isPending ? "Following" : "Follow"}
                                     </button>
                                 </div>
                             </Link>

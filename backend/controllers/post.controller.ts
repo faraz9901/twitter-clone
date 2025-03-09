@@ -64,12 +64,9 @@ export const commentOnPost = asyncHandler(async (req, res) => {
 
     if (!post) throw new ApiError('Post not found', 404);
 
-    const user = await User.findById(req.user.id);
-
-    if (!user) throw new ApiError('User not found', 404);
 
     post.comments.push({
-        user: user._id,
+        user: req.user.id,
         text: validatedBody.text,
     })
 
@@ -85,31 +82,29 @@ export const likeUnlikePost = asyncHandler(async (req, res) => {
 
     const post = await Post.findById(postId);
 
+    const userId = req.user.id;
+
     if (!post) throw new ApiError('Post not found', 404);
 
-    const user = await User.findById(req.user.id);
+    if (userId === post.user.toString()) throw new ApiError('You cannot like your own post', 400);
 
-    if (!user) throw new ApiError('User not found', 404);
-
-    if (user._id.toString() === post.user.toString()) throw new ApiError('You cannot like your own post', 400);
-
-    const isLiked = (post.likes as Types.ObjectId[]).includes(user._id);
+    const isLiked = (post.likes as Types.ObjectId[]).includes(userId);
 
     if (isLiked) {
-        await Post.findByIdAndUpdate(postId, { $pull: { likes: user._id } });
+        await Post.findByIdAndUpdate(postId, { $pull: { likes: userId } });
 
         //pull the post from the user's likedPosts array
-        await User.findByIdAndUpdate(user._id, { $pull: { likedPosts: post._id } });
+        await User.findByIdAndUpdate(userId, { $pull: { likedPosts: post._id } });
 
     } else {
-        await Post.findByIdAndUpdate(postId, { $push: { likes: user._id } });
+        await Post.findByIdAndUpdate(postId, { $push: { likes: userId } });
 
         //push the post to the user's likedPosts array
-        await User.findByIdAndUpdate(user._id, { $push: { likedPosts: post._id } });
+        await User.findByIdAndUpdate(userId, { $push: { likedPosts: post._id } });
 
         // create notification
         const notification = new Notification({
-            from: user._id,
+            from: userId,
             to: post.user,
             type: NotificationTypes.LIKE,
             isRead: false
@@ -125,7 +120,7 @@ export const likeUnlikePost = asyncHandler(async (req, res) => {
 
 export const getAllPosts = asyncHandler(async (req, res) => {
 
-    const posts = await Post.find().sort({ createdAt: -1 }).populate('user', 'username fullname profileImg').populate('comments.user', 'username fullname profileImg').populate('likes', 'username fullname profileImg');
+    const posts = await Post.find().sort({ createdAt: -1 }).populate('user', 'username fullname profileImg').populate('comments.user', 'username fullname profileImg')
 
     return res.status(200).json(new ApiSuccessResponse('Posts fetched successfully', posts));
 })
