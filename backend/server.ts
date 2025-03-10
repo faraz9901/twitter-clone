@@ -36,6 +36,7 @@ app.use('/api/notifications', forLoggedInUsers, notificationRoutes)
 
 //global error handler
 app.use((err: any, req: RequestWithUser, res: Response, next: NextFunction) => {
+    console.log(err)
     globalErrorHandler(err, req, res, next);
 });
 
