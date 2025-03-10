@@ -1,9 +1,11 @@
 import { useState } from "react";
 import CreatePost from "../../components/posts/CreatePost";
 import Posts from "../../components/posts/Posts";
+import { useAuth } from "../../context/User.Context";
 
 const HomePage = () => {
     const [feedType, setFeedType] = useState<"forYou" | "following">("forYou");
+    const { user } = useAuth()
 
     return (
         <>
@@ -36,7 +38,7 @@ const HomePage = () => {
                 <CreatePost />
 
                 {/* POSTS */}
-                <Posts feedType={feedType} />
+                {user && <Posts feedType={feedType} user={user} />}
             </div>
         </>
     );

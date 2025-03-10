@@ -1,6 +1,7 @@
 import express, { NextFunction, Response } from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import path from "path";
 
 // Routes
 import authRoutes from "./routes/auth.routes";
@@ -37,6 +38,15 @@ app.use('/api/notifications', forLoggedInUsers, notificationRoutes)
 app.use((err: any, req: RequestWithUser, res: Response, next: NextFunction) => {
     globalErrorHandler(err, req, res, next);
 });
+
+
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '..', 'frontend', 'dist')));
+
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '..', 'frontend', 'dist', 'index.html'));
+    })
+}
 
 
 app.listen(PORT, () => {
