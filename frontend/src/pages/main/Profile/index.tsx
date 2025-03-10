@@ -5,7 +5,6 @@ import ProfileSkeleton from "../../../components/common/skeletons/ProfileSkeleto
 import { POSTS } from "../../../data";
 import Posts from "../../../components/posts/Posts";
 import { CalendarDays, Link as Link2, MoveLeft, Pencil } from "lucide-react";
-import EditProfileModal from "./EditProfile";
 import { useAuth } from "../../../context/User.Context";
 import { useQuery } from "@tanstack/react-query";
 import { getJoinedDate } from "../../../utils";
@@ -13,6 +12,7 @@ import toast from "react-hot-toast";
 import { imageCompressor } from "../../../utils/imageCompressor";
 import useUpdateProfile from "../../../hooks/useUpdateProfile";
 import useFollow from "../../../hooks/useFollow";
+import EditProfileModal from "./EditProfile";
 
 const ProfilePage = () => {
     const { user: CurrentUser } = useAuth()

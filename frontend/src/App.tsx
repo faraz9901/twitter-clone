@@ -8,7 +8,7 @@ import RootLayout from "./pages/RootLayout";
 
 // Pages
 import HomePage from "./pages/main/Home";
-import ProfilePage from "./pages/main/profile";
+import ProfilePage from "./pages/main/Profile";
 import Notification from "./pages/main/Notifications";
 import LoginPage from "./pages/auth/Login";
 import SignUpPage from "./pages/auth/SignUp";
